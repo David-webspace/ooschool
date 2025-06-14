@@ -27,7 +27,7 @@ export default function Header({ user }: HeaderProps) {
           </>
         ) : (
           <>
-            <Link href="/login" className="hover:underline">Login</Link> Don&apos;t have an account?{' '}
+            <Link href="/login" className="hover:underline">Login</Link> Don't have an account?{' '}
             <Link href="/register" className="text-green-700 hover:underline">Register</Link>
           </>
         )}
