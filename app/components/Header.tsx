@@ -1,8 +1,4 @@
 import Link from 'next/link';
-import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_this';
 
 // Header.tsx
 interface HeaderProps {
@@ -31,8 +27,8 @@ export default function Header({ user }: HeaderProps) {
           </>
         ) : (
           <>
-            <Link href="/login" className="hover:underline">Login</Link>
-            <Link href="/register" className="hover:underline">Register</Link>
+            <Link href="/login" className="hover:underline">Login</Link> Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-green-700 hover:underline">Register</Link>
           </>
         )}
         <Link href="/cart" className="ml-4 relative">

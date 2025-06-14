@@ -31,6 +31,7 @@ export default function BookList() {
             className="bg-white rounded shadow p-4 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
             onClick={() => setSelectedBook(book)}
           >
+            {/* Consider replacing <img> with <Image> from next/image for better performance */}
             <img src={book.imageUrl} alt={book.title} className="w-32 h-44 object-cover mb-4 rounded" />
             <div className="font-semibold mb-1 text-center">{book.title}</div>
             <div className="text-sm text-gray-600 mb-2">{book.author}</div>

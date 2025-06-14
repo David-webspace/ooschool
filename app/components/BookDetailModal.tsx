@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React from "react";
 
 type Book = {
   id: number;
@@ -22,6 +22,7 @@ export default function BookDetailModal({ book, onClose }: { book: Book | null; 
           ×
         </button>
         <div className="flex flex-col md:flex-row gap-6">
+          {/* Consider replacing <img> with <Image> from next/image for better performance */}
           <img src={book.imageUrl} alt={book.title} className="w-36 h-52 object-cover rounded mb-4 md:mb-0" />
           <div>
             <h2 className="text-2xl font-bold mb-2 text-green-900">{book.title}</h2>

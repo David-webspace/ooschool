@@ -11,7 +11,7 @@ export default async function HeaderWrapper() {
   if (token) {
     try {
       user = jwt.verify(token, JWT_SECRET) as { id: number; email: string; name: string };
-    } catch (e) {
+    } catch {
       user = null;
     }
   }
