@@ -15,7 +15,7 @@ export default function Header({ user }: HeaderProps) {
         <nav className="hidden md:flex gap-6 ml-8">
           <Link href="/category/new">New Releases</Link>
           <Link href="/category/bestsellers">Bestsellers</Link>
-          <Link href="/category/children">Children's Books</Link>
+          <Link href="/category/children">Children&apos;s Books</Link>
           <Link href="/category/foreign">Foreign Books</Link>
         </nav>
       </div>
@@ -27,7 +27,7 @@ export default function Header({ user }: HeaderProps) {
           </>
         ) : (
           <>
-            <Link href="/login" className="hover:underline">Login</Link> Don't have an account?{' '}
+            <Link href="/login" className="hover:underline">Login</Link> Don&apos;t have an account?{' '}
             <Link href="/register" className="text-green-700 hover:underline">Register</Link>
           </>
         )}
