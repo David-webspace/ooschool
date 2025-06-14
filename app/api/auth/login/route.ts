@@ -15,12 +15,13 @@ export async function POST(req: NextRequest) {
     }
     const conn = await pool.getConnection();
     try {
-      const [userRows] = await conn.query('SELECT id, email, name, password_hash FROM users WHERE email = ?', [email]);
-      if ((userRows as any[]).length === 0) {
+      const [userRows] = await conn.query<mysql.RowDataPacket[]>('SELECT id, email, name, password_hash FROM users WHERE email = ?', [email]);
+      if (userRows.length === 0) {
         console.log(`Login failed: user not found for email ${email}`);
         return NextResponse.json({ error: 'Invalid credentials.' }, { status: 401 });
       }
-      const user = (userRows as any[])[0];
+      // RowDataPacket[] is a generic object, so cast for TS
+      const user = userRows[0] as { id: number; email: string; name: string; password_hash: string };
       const valid = await bcrypt.compare(password, user.password_hash);
       if (!valid) {
         console.log(`Login failed: password mismatch for email ${email}`);
@@ -40,8 +41,8 @@ export async function POST(req: NextRequest) {
     } finally {
       conn.release();
     }
-  } catch (err: any) {
+  } catch (err) {
     console.error('Login error:', err);
-    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: (err instanceof Error ? err.message : 'Internal server error') }, { status: 500 });
   }
 }

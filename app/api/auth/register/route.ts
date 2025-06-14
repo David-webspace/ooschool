@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
     }
     const conn = await pool.getConnection();
     try {
-      const [userExists] = await conn.query('SELECT id FROM users WHERE email = ?', [email]);
-      if ((userExists as any[]).length > 0) {
+      const [userExists] = await conn.query<mysql.RowDataPacket[]>('SELECT id FROM users WHERE email = ?', [email]);
+      if (userExists.length > 0) {
         return NextResponse.json({ error: 'Email already registered.' }, { status: 409 });
       }
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     } finally {
       conn.release();
     }
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || 'Internal server error' }, { status: 500 });
+  } catch (err) {
+    return NextResponse.json({ error: (err instanceof Error ? err.message : 'Internal server error') }, { status: 500 });
   }
 }
