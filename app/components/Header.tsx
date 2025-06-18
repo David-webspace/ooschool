@@ -1,3 +1,4 @@
+"use client"
 import Link from 'next/link';
 
 // Header.tsx
@@ -23,7 +24,16 @@ export default function Header({ user }: HeaderProps) {
         {user ? (
           <>
             <Link href="/profile" className="hover:underline">Profile</Link>
-            <Link href="/logout" className="hover:underline">Logout</Link>
+            <button
+              onClick={async () => {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/login';
+              }}
+              className="hover:underline bg-transparent border-none cursor-pointer"
+              style={{ background: 'none', border: 'none', padding: 0 }}
+            >
+              Logout
+            </button>
           </>
         ) : (
           <>
