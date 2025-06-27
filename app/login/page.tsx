@@ -4,23 +4,28 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [passwords, setPasswords] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const res = await fetch("/api/auth/login", {
+    const res = await fetch("http://localhost:3001/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, passwords }),
     });
     if (res.ok) {
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user)); // Store user info
+      }
       router.push("/");
     } else {
       const data = await res.json();
-      setError(data.error || "Login failed");
+      setError(data.message || data.error || "Login failed");
     }
   }
 
@@ -38,8 +43,8 @@ export default function LoginPage() {
         />
         <input
           type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
+          value={passwords}
+          onChange={e => setPasswords(e.target.value)}
           placeholder="Password"
           className="px-4 py-2 border rounded"
           required

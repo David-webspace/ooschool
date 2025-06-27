@@ -3,9 +3,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [passwords, setPasswords] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
@@ -14,29 +16,43 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     setSuccess(false);
-    const res = await fetch("/api/auth/register", {
+    const res = await fetch("http://localhost:3001/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify({
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        phone_number: phoneNumber,
+        passwords: passwords
+      }),
     });
     if (res.ok) {
       setSuccess(true);
       setTimeout(() => router.push("/login"), 1500);
     } else {
       const data = await res.json();
-      setError(data.error || "Registration failed");
+      setError(data.message || data.error || "Registration failed");
     }
   }
 
   return (
     <div className="max-w-md mx-auto mt-16 bg-white p-8 rounded shadow">
       <h2 className="text-2xl font-bold mb-6 text-green-800">Register</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-gray-300">
         <input
           type="text"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder="Name"
+          value={firstName}
+          onChange={e => setFirstName(e.target.value)}
+          placeholder="First Name"
+          className="px-4 py-2 border rounded"
+          required
+        />
+        <input
+          type="text"
+          value={lastName}
+          onChange={e => setLastName(e.target.value)}
+          placeholder="Last Name"
           className="px-4 py-2 border rounded"
           required
         />
@@ -49,9 +65,17 @@ export default function RegisterPage() {
           required
         />
         <input
+          type="text"
+          value={phoneNumber}
+          onChange={e => setPhoneNumber(e.target.value)}
+          placeholder="Phone Number"
+          className="px-4 py-2 border rounded"
+          required
+        />
+        <input
           type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
+          value={passwords}
+          onChange={e => setPasswords(e.target.value)}
           placeholder="Password"
           className="px-4 py-2 border rounded"
           required
