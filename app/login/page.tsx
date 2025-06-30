@@ -1,31 +1,45 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { login } from "../api/auth";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [passwords, setPasswords] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const res = await fetch("http://localhost:3001/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, passwords }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.token) {
+    // const res = await fetch("http://localhost:3001/api/login", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ email, passwords }),
+    // });
+    // if (res.ok) {
+    //   const data = await res.json();
+    //   if (data.token) {
+    //     localStorage.setItem('token', data.token);
+    //     localStorage.setItem('user', JSON.stringify(data.user)); // Store user info
+    //   }
+    //   router.push("/");
+    // } else {
+    //   const data = await res.json();
+    //   setError(data.message || data.error || "Login failed");
+    // }
+
+    try{
+      const data = await login(email, password);
+      if(data.token){
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user)); // Store user info
       }
       router.push("/");
-    } else {
-      const data = await res.json();
-      setError(data.message || data.error || "Login failed");
+    }
+    catch(err: any){
+      setError(err.message || "Login failed");
     }
   }
 
@@ -43,8 +57,8 @@ export default function LoginPage() {
         />
         <input
           type="password"
-          value={passwords}
-          onChange={e => setPasswords(e.target.value)}
+          value={password}
+          onChange={e => setPassword(e.target.value)}
           placeholder="Password"
           className="px-4 py-2 border rounded"
           required
@@ -55,8 +69,9 @@ export default function LoginPage() {
         </button>
       </form>
       <div className="mt-4 text-sm text-center">
-        Don&apos;t have an account? <a href="/register" className="text-green-700 hover:underline">Register</a>
+        Don&apos;t have an account? <Link href="/register" className="text-green-700 hover:underline">Register</Link>
       </div>
+
     </div>
   );
 }

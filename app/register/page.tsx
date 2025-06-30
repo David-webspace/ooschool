@@ -1,6 +1,8 @@
 "use client"
 import { useRouter } from "next/navigation";
 import { useState } from "react"
+import { register } from "../api/auth";
+import Link from "next/link";
 
 export default function Registerpage(){
   const [firstName, setFirstName] = useState("");
@@ -16,23 +18,20 @@ export default function Registerpage(){
     e.preventDefault();
     setError("");
     setSuccess(false);
-    const res = await fetch("http://localhost:3001/api/register", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
+
+    //axios
+    try{
+      await register({
         first_name: firstName,
         last_name: lastName,
         email: email,
-        phone_number: phoneNumber,
-        passwords: passwords
-      })
-    });
-    if(res.ok){
+        passwords: passwords,
+        phone_number: phoneNumber
+      });
       setSuccess(true);
       setTimeout(() => router.push("/login"), 1500);
-    }else{
-      const data = await res.json();
-      setError(data.message || data.error || "Register Failed");
+    }catch(err: any){
+      setError(err.message || "Registration failed");
     }
   }
 
@@ -86,8 +85,8 @@ export default function Registerpage(){
           Register
         </button>
         <div className="mt-4 text-sm text-center">
-          Already have a account?
-          <a href="/login" className="text-green-700 hover:underline">Login</a>
+          Already have a account? 
+          <Link href="/login" className="text-green-700 hover:underline">Login</Link>
         </div>
       </form>
     </div>

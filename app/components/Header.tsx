@@ -3,24 +3,16 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 // Header.tsx
-interface HeaderProps {
-  user: null | { id: number; email: string; name: string };
-}
+type User = { id: number; email: string; name: string} | null;
 
-export default function Header() {
-  type UserType = {
-    id: number;
-    email: string;
-    first_name: string;
-    last_name: string;
-    phone_number: string;
-  };
-  const [user, setUser] = useState<UserType | null>(null);
+export default function Header( { user }: {user: User}) {
+  
+  const [userInfo, setUserInfo] = useState<User>(user);
 
   useEffect(() => {
     const userStr = typeof window !== "undefined" ? localStorage.getItem("user") : null;
     if (userStr) {
-      setUser(JSON.parse(userStr));
+      setUserInfo(JSON.parse(userStr));
     }
   }, []);
 
@@ -38,15 +30,15 @@ export default function Header() {
         </nav>
       </div>
       <div className="flex items-center gap-4">
-        {user ? (
+        {userInfo ? (
           <div className="flex items-center gap-4">
-            <span className="font-bold text-green-700 bg-white px-3 py-1 rounded">{user.first_name}</span>
+            <Link href="/profile" className="font-bold text-green-700 bg-white px-3 py-1 rounded">{userInfo?.name}</Link>
             <button
               className="ml-2 px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
               onClick={() => {
                 localStorage.removeItem('user');
                 localStorage.removeItem('token');
-                setUser(null);
+                setUserInfo(null);
               }}
             >
               Logout
@@ -54,8 +46,8 @@ export default function Header() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Link href="/login" className="hover:underline">Login</Link> Don't have an account?{' '}
-            <Link href="/register" className="text-green-700 hover:underline">Register</Link>
+            <Link href="/login" className="hover:underline mr-5">Login</Link>
+            <Link href="/register" className="text-white hover:underline">Register</Link>
           </div>
         )}
         <Link href="/cart" className="ml-4 relative">

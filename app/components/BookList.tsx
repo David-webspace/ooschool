@@ -1,48 +1,102 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BookDetailModal from "./BookDetailModal";
+import { useRouter } from "next/navigation";
+import { getProducts } from "../api/product";
+import { addToCart } from "../api/cart";
 
 type Book = {
   id: number;
   title: string;
   author: string;
   price: number;
-  imageUrl: string;
   description: string;
-};
+  thumbnail: string;
+}
 
-const mockBooks: Book[] = [
-  { id: 1, title: 'Atomic Habits', author: 'James Clear', price: 19.99, imageUrl: '/mock/atomic-habits.jpg', description: 'A guide to building good habits and breaking bad ones.' },
-  { id: 2, title: 'The Lean Startup', author: 'Eric Ries', price: 22.99, imageUrl: '/mock/lean-startup.jpg', description: 'How today’s entrepreneurs use continuous innovation to create radically successful businesses.' },
-  { id: 3, title: 'Deep Work', author: 'Cal Newport', price: 17.99, imageUrl: '/mock/deep-work.jpg', description: 'Rules for focused success in a distracted world.' },
-  { id: 4, title: 'Educated', author: 'Tara Westover', price: 15.99, imageUrl: '/mock/educated.jpg', description: 'A memoir about a woman who grew up in a survivalist family and went on to earn a PhD from Cambridge University.' },
-];
+export default function BookList({ search = "" }: { search?: string }) {
+  const [products, setProducts] = useState<Book[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-export default function BookList() {
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  useEffect(() =>  {
+    const fetchProducts = async () => {
+      try{
+        const products = await getProducts();
+        setProducts(products);
+      }
+      catch(err){
+        console.log(err);
+        setError(error);
+      }
+    } 
+    fetchProducts();
+  }, []);
+
+  const handleAddtoCart = async (book: Book, e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    // Get ser info(assuming you store user in localStorage)
+    const userStr = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    const userObj = userStr ? JSON.parse(userStr) : null;
+    const userId = userObj ? userObj.id : null;
+
+    if(!userId){
+      setError("Please log in to add to cart.");
+      return;
+    }
+
+    try{
+      await addToCart({
+        customer_id: userId,
+        product_id: book.id,
+        title: book.title,
+        price: book.price,
+        quantity: 1,
+      })
+      setSuccess("Book added to cart successfully");
+    }
+    catch(err: any){
+      console.log(err);
+      setError(err?.response?.data?.message || "Failed to add to cart");
+    }
+    finally{
+      
+    }
+  }
 
   return (
     <section className="w-full max-w-5xl mx-auto py-12 px-4">
       <h3 className="text-2xl font-bold mb-6 text-green-800">Featured Books</h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-        {mockBooks.map(book => (
-          <div
-            key={book.id}
-            className="bg-white rounded shadow p-4 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => setSelectedBook(book)}
-          >
-            {/* Consider replacing <img> with <Image> from next/image for better performance */}
-            <img src={book.imageUrl} alt={book.title} className="w-32 h-44 object-cover mb-4 rounded" />
-            <div className="font-semibold mb-1 text-center">{book.title}</div>
-            <div className="text-sm text-gray-600 mb-2">{book.author}</div>
-            <div className="text-green-700 font-bold mb-2">${book.price.toFixed(2)}</div>
-            <button className="bg-green-700 text-white px-4 py-1 rounded hover:bg-green-800" onClick={e => { e.stopPropagation(); /* Add to cart logic here */ }}>
-              Add to Cart
-            </button>
-          </div>
-        ))}
+        {products
+          .filter(book => {
+            const q = search.toLowerCase();
+            return (
+              book.title.toLowerCase().includes(q) ||
+              book.author.toLowerCase().includes(q)
+            );
+          })
+          .map(book => (
+            <div
+              key={book.id}
+              className="bg-white rounded shadow p-4 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+              // onClick={() => setSelectedBook(book)}
+            >
+              {/* Consider replacing <img> with <Image> from next/image for better performance */}
+              <img src={book.thumbnail} alt={book.title} className="w-full h-44 object-cover mb-4 rounded" />
+              <div className="font-semibold mb-1 text-center">{book.title}</div>
+              <div className="text-sm text-gray-600 mb-2">{book.author}</div>
+              <div className="text-green-700 font-bold mb-2">${book.price.toFixed(2)}</div>
+              <button className="bg-green-700 text-white px-4 py-1 rounded hover:bg-green-800" onClick={e => { e.stopPropagation(); handleAddtoCart(book, e); }}>
+                Add to Cart
+              </button>
+            </div>
+          ))}
       </div>
-      <BookDetailModal book={selectedBook} onClose={() => setSelectedBook(null)} />
+      {/* <BookDetailModal book={selectedBook} onClose={() => setSelectedBook(null)} /> */}
     </section>
   );
 }

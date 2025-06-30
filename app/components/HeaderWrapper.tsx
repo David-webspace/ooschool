@@ -8,11 +8,12 @@ export default async function HeaderWrapper() {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   let user = null;
+
   if (token) {
     try {
       user = jwt.verify(token, JWT_SECRET) as { id: number; email: string; name: string };
-    } catch {
-      user = null;
+    } catch(e) {
+      // user = null;
     }
   }
   return <Header user={user} />;

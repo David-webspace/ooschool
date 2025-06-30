@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
+import Link from 'next/link';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_this';
 
@@ -20,7 +21,7 @@ export default async function ProfilePage() {
       <div className="max-w-md mx-auto mt-16 bg-white p-8 rounded shadow text-center">
         <h2 className="text-2xl font-bold mb-4 text-green-800">Not Authorized</h2>
         <p className="mb-4">You must be logged in to view this page.</p>
-        <a href="/login" className="text-green-700 hover:underline">Go to Login</a>
+        <Link href="/login" className="text-green-700 hover:underline">Go to Login</Link>
       </div>
     );
   }
